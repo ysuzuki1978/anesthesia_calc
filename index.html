@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>麻酔管理料計算アプリ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans JP', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f7;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #1d1d1f;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1d1d1f;
+            border-bottom: 2px solid #007aff;
+            padding-bottom: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 12px;
+        }
+        
+        label {
+            font-weight: 500;
+            min-width: 100px;
+            color: #1d1d1f;
+        }
+        
+        input[type="number"] {
+            width: 80px;
+            padding: 8px 12px;
+            border: 2px solid #d1d1d6;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #007aff;
+        }
+        
+        select {
+            padding: 8px 12px;
+            border: 2px solid #d1d1d6;
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: white;
+            min-width: 120px;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #007aff;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #007aff;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #007aff, #5856d6);
+            color: white;
+            text-align: center;
+        }
+        
+        .total-points {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .total-yen {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+        
+        .detail-item {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #007aff;
+        }
+        
+        .detail-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .detail-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+        
+        .extension-details {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #007aff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        
+        .btn-secondary {
+            background-color: #8e8e93;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #6d6d70;
+        }
+        
+        .summary-info {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+        
+        .summary-info h4 {
+            color: #1565c0;
+            margin-bottom: 8px;
+        }
+        
+        .notice {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .notice h4 {
+            color: #856404;
+            margin-bottom: 8px;
+        }
+        
+        .notice ul {
+            margin-left: 20px;
+        }
+        
+        .notice li {
+            margin-bottom: 4px;
+        }
+        
+        .standalone-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .standalone-message h3 {
+            color: #155724;
+            margin-bottom: 12px;
+        }
+        
+        .standalone-message p {
+            color: #155724;
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            label {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="standalone-message">
+            <h3>スタンドアロン版 麻酔管理料計算アプリ</h3>
+            <p>このHTMLファイルは単体で動作します。Webサーバーは不要です。</p>
+            <p>JavaのWebアプリ版を起動するには、run.sh を実行してください。</p>
+        </div>
+        
+        <h1>麻酔管理料計算アプリ</h1>
+        
+        <form id="calculationForm">
+            <!-- 基本設定 -->
+            <div class="card">
+                <h3 class="section-title">基本設定</h3>
+                
+                <div class="form-group">
+                    <div class="form-row">
+                        <label>重症度:</label>
+                        <select name="severity" id="severity">
+                            <option value="normal">ロ（通常患者）</option>
+                            <option value="difficult">イ（困難患者）</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <h4>麻酔時間（レベル別）</h4>
+                    <div class="form-row">
+                        <label>レベル1:</label>
+                        <input type="number" name="level1" id="level1" min="0" placeholder="分">
+                        <span>分</span>
+                    </div>
+                    <div class="form-row">
+                        <label>レベル2:</label>
+                        <input type="number" name="level2" id="level2" min="0" placeholder="分">
+                        <span>分</span>
+                    </div>
+                    <div class="form-row">
+                        <label>レベル3:</label>
+                        <input type="number" name="level3" id="level3" min="0" placeholder="分">
+                        <span>分</span>
+                    </div>
+                    <div class="form-row">
+                        <label>レベル4:</label>
+                        <input type="number" name="level4" id="level4" min="0" placeholder="分">
+                        <span>分</span>
+                    </div>
+                    <div class="form-row">
+                        <label>レベル5:</label>
+                        <input type="number" name="level5" id="level5" min="0" placeholder="分">
+                        <span>分</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 追加設定 -->
+            <div class="card">
+                <h3 class="section-title">追加設定</h3>
+                
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="hasEpidural" id="hasEpidural">
+                        <label for="hasEpidural">硬膜外麻酔を実施</label>
+                    </div>
+                    <div class="form-row" id="epiduralLocationRow" style="display: none;">
+                        <label>部位:</label>
+                        <select name="epiduralLocation" id="epiduralLocation">
+                            <option value="lumbar">腰部</option>
+                            <option value="cervical">頸・胸部</option>
+                            <option value="sacral">仙骨部</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="hasNerveBlock" id="hasNerveBlock">
+                        <label for="hasNerveBlock">神経ブロックを実施</label>
+                    </div>
+                    <div class="form-row" id="nerveBlockTypeRow" style="display: none;">
+                        <label>種類:</label>
+                        <select name="nerveBlockType" id="nerveBlockType">
+                            <option value="other">その他</option>
+                            <option value="epiduralSubstitute">硬膜外代用</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="hasOvertime" id="hasOvertime">
+                        <label for="hasOvertime">時間外加算（1.4倍）</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="hasNightHoliday" id="hasNightHoliday">
+                        <label for="hasNightHoliday">深夜・休日加算（1.8倍）</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button type="button" class="btn-primary" onclick="calculateResults()">計算実行</button>
+                <button type="button" class="btn-secondary" onclick="resetForm()">リセット</button>
+            </div>
+        </form>
+        
+        <!-- 計算結果 -->
+        <div class="card result-card" id="resultCard" style="display: none;">
+            <div class="total-points" id="totalPoints">0点</div>
+            <div class="total-yen" id="totalYen">¥0</div>
+        </div>
+        
+        <!-- 詳細結果 -->
+        <div class="card" id="detailsCard" style="display: none;">
+            <h3 class="section-title">計算詳細</h3>
+            <div class="details-grid" id="detailsGrid">
+                <!-- 詳細項目がここに動的に追加されます -->
+            </div>
+            
+            <div class="summary-info" id="summaryInfo">
+                <!-- 計算サマリーがここに表示されます -->
+            </div>
+        </div>
+        
+        <!-- 注意事項 -->
+        <div class="notice">
+            <h4>注意事項</h4>
+            <ul>
+                <li>最も高いレベルの麻酔を基準として基本点数を算定</li>
+                <li>2時間を超えた場合、30分単位で時間延長加算</li>
+                <li>硬膜外麻酔の時間延長は全身麻酔時間に基づく</li>
+                <li>神経ブロック硬膜外代用は硬膜外麻酔と併用不可</li>
+                <li>時間外・深夜休日加算は診療報酬算定要件を満たす場合のみ適用</li>
+                <li>本アプリは計算支援ツールです。実際の請求は最新の診療報酬点数表を確認してください</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // 麻酔管理料計算ロジック（JavaScriptに移植）
+        class AnesthesiaCalculator {
+            constructor() {
+                this.initializeTables();
+                this.resetCalculator();
+            }
+            
+            initializeTables() {
+                // 基本点数表
+                this.basePointsTable = {
+                    1: { difficult: 24900, normal: 18200 },
+                    2: { difficult: 16720, normal: 12190 },
+                    3: { difficult: 12610, normal: 9170 },
+                    4: { difficult: 9130, normal: 6610 },
+                    5: { difficult: 8300, normal: 6000 }
+                };
+                
+                // 時間延長加算表
+                this.timeExtensionTable = {
+                    1: 1800, 2: 1200, 3: 900, 4: 660, 5: 600
+                };
+                
+                // 硬膜外麻酔加算表
+                this.epiduralPointsTable = {
+                    cervical: 750, lumbar: 400, sacral: 170
+                };
+                
+                // 硬膜外時間延長加算表
+                this.epiduralTimeExtensionTable = {
+                    cervical: 375, lumbar: 200, sacral: 85
+                };
+                
+                // 神経ブロック加算表
+                this.nerveBlockPointsTable = {
+                    epiduralSubstitute: 450, other: 45
+                };
+            }
+            
+            resetCalculator() {
+                this.anesthesiaTimes = [0, 0, 0, 0, 0]; // レベル1-5
+                this.severityLevel = 'normal';
+                this.hasEpiduralAnesthesia = false;
+                this.epiduralLocation = 'lumbar';
+                this.hasNerveBlock = false;
+                this.nerveBlockType = 'other';
+                this.hasOvertimeAddition = false;
+                this.hasNightHolidayAddition = false;
+            }
+            
+            updateFromForm() {
+                const form = document.getElementById('calculationForm');
+                const formData = new FormData(form);
+                
+                // 麻酔時間
+                for (let i = 1; i <= 5; i++) {
+                    const value = formData.get(`level${i}`);
+                    this.anesthesiaTimes[i-1] = value ? Math.max(0, parseInt(value)) : 0;
+                }
+                
+                // その他の設定
+                this.severityLevel = formData.get('severity') || 'normal';
+                this.hasEpiduralAnesthesia = formData.has('hasEpidural');
+                this.epiduralLocation = formData.get('epiduralLocation') || 'lumbar';
+                this.hasNerveBlock = formData.has('hasNerveBlock');
+                this.nerveBlockType = formData.get('nerveBlockType') || 'other';
+                this.hasOvertimeAddition = formData.has('hasOvertime');
+                this.hasNightHolidayAddition = formData.has('hasNightHoliday');
+            }
+            
+            getActiveLevels() {
+                const actives = [];
+                for (let i = 0; i < 5; i++) {
+                    if (this.anesthesiaTimes[i] > 0) {
+                        actives.push({ level: i + 1, minutes: this.anesthesiaTimes[i] });
+                    }
+                }
+                return actives.sort((a, b) => a.level - b.level);
+            }
+            
+            getHighestLevel() {
+                const actives = this.getActiveLevels();
+                return actives.length > 0 ? actives[0].level : 5;
+            }
+            
+            getTotalMinutes() {
+                return this.anesthesiaTimes.reduce((sum, minutes) => sum + minutes, 0);
+            }
+            
+            calculateTimeExtension() {
+                const actives = this.getActiveLevels();
+                if (actives.length === 0) return { details: [], total: 0 };
+                
+                let remainingBaseTime = 120;
+                const levelTimes = actives.map(active => ({
+                    level: active.level,
+                    minutes: active.minutes,
+                    baseUsed: 0,
+                    extensionMinutes: 0
+                }));
+                
+                // 基本時間配分
+                for (let i = 0; i < levelTimes.length; i++) {
+                    const availableTime = Math.min(remainingBaseTime, levelTimes[i].minutes);
+                    levelTimes[i].baseUsed = availableTime;
+                    remainingBaseTime -= availableTime;
+                    if (remainingBaseTime <= 0) break;
+                }
+                
+                // 延長時間計算（借用ロジック）
+                const availableExtensionTimes = levelTimes.map(lt => lt.minutes - lt.baseUsed);
+                
+                for (let i = 0; i < levelTimes.length; i++) {
+                    const availableTime = availableExtensionTimes[i];
+                    if (availableTime > 0) {
+                        const neededBlocks = Math.ceil(availableTime / 30);
+                        const neededTime = neededBlocks * 30;
+                        
+                        if (neededTime <= availableTime) {
+                            levelTimes[i].extensionMinutes = neededTime;
+                        } else {
+                            const shortage = neededTime - availableTime;
+                            let totalBorrowed = 0;
+                            
+                            for (let j = i + 1; j < availableExtensionTimes.length; j++) {
+                                if (totalBorrowed >= shortage) break;
+                                const canBorrow = Math.min(availableExtensionTimes[j], shortage - totalBorrowed);
+                                availableExtensionTimes[j] -= canBorrow;
+                                totalBorrowed += canBorrow;
+                            }
+                            
+                            levelTimes[i].extensionMinutes = neededTime;
+                        }
+                    }
+                }
+                
+                // 加算計算
+                const details = [];
+                let total = 0;
+                
+                for (const levelTime of levelTimes) {
+                    if (levelTime.extensionMinutes > 0) {
+                        const extensionBlocks = Math.ceil(levelTime.extensionMinutes / 30);
+                        const pointsPerBlock = this.timeExtensionTable[levelTime.level];
+                        const points = extensionBlocks * pointsPerBlock;
+                        
+                        if (points > 0) {
+                            details.push({ level: levelTime.level, points });
+                            total += points;
+                        }
+                    }
+                }
+                
+                return { details, total };
+            }
+            
+            calculate() {
+                const totalMinutes = this.getTotalMinutes();
+                
+                if (totalMinutes === 0) {
+                    return {
+                        totalPoints: 0,
+                        basePoints: 0,
+                        timeExtensionPoints: 0,
+                        epiduralPoints: 0,
+                        epiduralTimeExtensionPoints: 0,
+                        nerveBlockPoints: 0,
+                        totalMinutes: 0,
+                        highestLevel: 5,
+                        timeExtensionDetails: [],
+                        activeLevels: []
+                    };
+                }
+                
+                // 基本点数
+                const basePoints = this.basePointsTable[this.getHighestLevel()][this.severityLevel];
+                
+                // 時間延長加算
+                const timeExtension = this.calculateTimeExtension();
+                
+                // 硬膜外麻酔加算
+                let epiduralPoints = 0;
+                if (this.hasEpiduralAnesthesia && 
+                    !(this.hasNerveBlock && this.nerveBlockType === 'epiduralSubstitute')) {
+                    epiduralPoints = this.epiduralPointsTable[this.epiduralLocation];
+                }
+                
+                // 硬膜外時間延長加算
+                let epiduralTimeExtensionPoints = 0;
+                if (this.hasEpiduralAnesthesia && 
+                    !(this.hasNerveBlock && this.nerveBlockType === 'epiduralSubstitute')) {
+                    const overtimeMinutes = Math.max(0, totalMinutes - 120);
+                    if (overtimeMinutes > 0) {
+                        const extensionBlocks = Math.ceil(overtimeMinutes / 30);
+                        const pointsPerBlock = this.epiduralTimeExtensionTable[this.epiduralLocation];
+                        epiduralTimeExtensionPoints = extensionBlocks * pointsPerBlock;
+                    }
+                }
+                
+                // 神経ブロック加算
+                let nerveBlockPoints = 0;
+                if (this.hasNerveBlock) {
+                    nerveBlockPoints = this.nerveBlockPointsTable[this.nerveBlockType];
+                }
+                
+                // 小計
+                const baseTotal = basePoints + timeExtension.total + epiduralPoints + 
+                                epiduralTimeExtensionPoints + nerveBlockPoints;
+                
+                // 加算倍率
+                let multiplier = 1.0;
+                if (this.hasOvertimeAddition) multiplier = 1.4;
+                if (this.hasNightHolidayAddition) multiplier = 1.8;
+                
+                const totalPoints = Math.floor(baseTotal * multiplier);
+                
+                return {
+                    totalPoints,
+                    basePoints,
+                    timeExtensionPoints: timeExtension.total,
+                    epiduralPoints,
+                    epiduralTimeExtensionPoints,
+                    nerveBlockPoints,
+                    totalMinutes,
+                    highestLevel: this.getHighestLevel(),
+                    timeExtensionDetails: timeExtension.details,
+                    activeLevels: this.getActiveLevels()
+                };
+            }
+        }
+        
+        // グローバルな計算機インスタンス
+        const calculator = new AnesthesiaCalculator();
+        
+        // フォーム要素の参照
+        const form = document.getElementById('calculationForm');
+        const hasEpiduralCheckbox = document.getElementById('hasEpidural');
+        const epiduralLocationRow = document.getElementById('epiduralLocationRow');
+        const hasNerveBlockCheckbox = document.getElementById('hasNerveBlock');
+        const nerveBlockTypeRow = document.getElementById('nerveBlockTypeRow');
+        
+        // チェックボックスの状態に応じて関連要素の表示/非表示を切り替え
+        hasEpiduralCheckbox.addEventListener('change', function() {
+            epiduralLocationRow.style.display = this.checked ? 'flex' : 'none';
+            calculateResults();
+        });
+        
+        hasNerveBlockCheckbox.addEventListener('change', function() {
+            nerveBlockTypeRow.style.display = this.checked ? 'flex' : 'none';
+            calculateResults();
+        });
+        
+        // 入力値変更時の自動計算
+        form.addEventListener('input', calculateResults);
+        form.addEventListener('change', calculateResults);
+        
+        // 計算実行関数
+        function calculateResults() {
+            calculator.updateFromForm();
+            const result = calculator.calculate();
+            displayResults(result);
+        }
+        
+        // 結果表示関数
+        function displayResults(result) {
+            const resultCard = document.getElementById('resultCard');
+            const detailsCard = document.getElementById('detailsCard');
+            
+            if (result.totalMinutes > 0) {
+                // 総計表示
+                document.getElementById('totalPoints').textContent = result.totalPoints + '点';
+                document.getElementById('totalYen').textContent = '¥' + (result.totalPoints * 10).toLocaleString();
+                
+                resultCard.style.display = 'block';
+                detailsCard.style.display = 'block';
+                
+                // 詳細表示
+                displayDetails(result);
+                displaySummary(result);
+            } else {
+                resultCard.style.display = 'none';
+                detailsCard.style.display = 'none';
+            }
+        }
+        
+        // 詳細項目表示
+        function displayDetails(result) {
+            const detailsGrid = document.getElementById('detailsGrid');
+            detailsGrid.innerHTML = '';
+            
+            // 基本点数
+            if (result.basePoints > 0) {
+                addDetailItem(detailsGrid, `基本点数（レベル${result.highestLevel}）`, result.basePoints + '点');
+            }
+            
+            // 時間延長加算
+            if (result.timeExtensionPoints > 0) {
+                let extensionText = result.timeExtensionPoints + '点';
+                if (result.timeExtensionDetails.length > 0) {
+                    extensionText += '<div class="extension-details">';
+                    result.timeExtensionDetails.forEach(detail => {
+                        extensionText += `レベル${detail.level}: ${detail.points}点<br>`;
+                    });
+                    extensionText += '</div>';
+                }
+                addDetailItem(detailsGrid, '時間延長加算', extensionText);
+            }
+            
+            // 硬膜外麻酔加算
+            if (result.epiduralPoints > 0) {
+                addDetailItem(detailsGrid, '硬膜外麻酔加算', result.epiduralPoints + '点');
+            }
+            
+            // 硬膜外時間延長加算
+            if (result.epiduralTimeExtensionPoints > 0) {
+                addDetailItem(detailsGrid, '硬膜外時間延長加算', result.epiduralTimeExtensionPoints + '点');
+            }
+            
+            // 神経ブロック加算
+            if (result.nerveBlockPoints > 0) {
+                addDetailItem(detailsGrid, '神経ブロック加算', result.nerveBlockPoints + '点');
+            }
+        }
+        
+        // 詳細項目追加
+        function addDetailItem(container, label, value) {
+            const item = document.createElement('div');
+            item.className = 'detail-item';
+            item.innerHTML = `
+                <div class="detail-label">${label}</div>
+                <div class="detail-value">${value}</div>
+            `;
+            container.appendChild(item);
+        }
+        
+        // サマリー表示
+        function displaySummary(result) {
+            const summaryInfo = document.getElementById('summaryInfo');
+            
+            let activeLevelsText = result.activeLevels.map(level => 
+                `レベル${level.level}(${level.minutes}分)`
+            ).join(', ');
+            
+            if (activeLevelsText === '') {
+                activeLevelsText = 'なし';
+            }
+            
+            let extensionTime = Math.max(0, result.totalMinutes - 120);
+            
+            summaryInfo.innerHTML = `
+                <h4>計算の詳細</h4>
+                <p><strong>使用レベル:</strong> ${activeLevelsText}</p>
+                <p><strong>最高レベル:</strong> レベル${result.highestLevel}</p>
+                <p><strong>総麻酔時間:</strong> ${result.totalMinutes}分 (${Math.floor(result.totalMinutes / 60)}時間${result.totalMinutes % 60}分)</p>
+                ${extensionTime > 0 ? `<p><strong>延長時間:</strong> ${extensionTime}分</p>` : ''}
+            `;
+        }
+        
+        // リセット関数
+        function resetForm() {
+            calculator.resetCalculator();
+            form.reset();
+            document.getElementById('resultCard').style.display = 'none';
+            document.getElementById('detailsCard').style.display = 'none';
+            epiduralLocationRow.style.display = 'none';
+            nerveBlockTypeRow.style.display = 'none';
+        }
+        
+        // 初期計算実行
+        calculateResults();
+    </script>
+</body>
+</html>
