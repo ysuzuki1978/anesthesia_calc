@@ -2,7 +2,7 @@
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blue)](https://ysuzuki1978.github.io/anesthesia_calc/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/Version-1.2-green)](https://github.com/ysuzuki1978/anesthesia_calc)
+[![Version](https://img.shields.io/badge/Version-1.3-green)](https://github.com/ysuzuki1978/anesthesia_calc)
 
 iOS版から移植された麻酔管理料計算アプリのWebバージョンです。保険点数の計算ロジックを正確に移植した、完全スタンドアロンのWebアプリです。
 
@@ -111,11 +111,15 @@ iOS版から移植された麻酔管理料計算アプリのWebバージョン�
 
 ## 開発情報
 
-- **バージョン**: 1.2
+- **バージョン**: 1.3
 - **原版**: iOS Swift版（AnesthesiaCalculator_iphone_LTS）
 - **移植版**: HTML/JavaScript
 - **対応診療報酬**: 2026年7月反映の改定版（令和6年（2024年）改訂版をベースに、レベル4関連の点数を更新）
 - **更新通知**: `version.json` を定期チェックし、公開版が更新されると画面上部にバナーで通知（詳細は「アプリの更新通知機能」参照）
+
+### 変更履歴
+- **1.3**: バグ修正 — 時間外・深夜休日加算の倍率（1.4倍／1.8倍）が神経ブロック加算にも誤って乗算されていた問題を修正。倍率は全身麻酔（基本点数・時間延長加算）と硬膜外麻酔加算にのみ適用し、神経ブロック加算は非乗算のまま合算するよう変更
+- **1.2**: レベル4の基本点数・時間延長加算を改定内容に合わせて更新、更新通知機能を追加
 
 ## アプリの更新通知機能
 
