@@ -245,7 +245,44 @@
             color: #155724;
             margin-bottom: 8px;
         }
-        
+
+        .update-banner {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: #1d1d1f;
+            color: white;
+            padding: 12px 20px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .update-banner button {
+            padding: 6px 14px;
+            font-size: 0.85rem;
+        }
+
+        .update-banner .btn-update {
+            background-color: #007aff;
+            color: white;
+        }
+
+        .update-banner .btn-dismiss {
+            background: transparent;
+            color: #d1d1d6;
+            text-decoration: underline;
+            padding: 6px 8px;
+        }
+
+        .app-version {
+            text-align: center;
+            color: #8e8e93;
+            font-size: 0.8rem;
+            margin-top: 16px;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 10px;
@@ -271,6 +308,11 @@
     </style>
 </head>
 <body>
+    <div id="updateBanner" class="update-banner" role="alert">
+        <span id="updateBannerText"></span>
+        <button type="button" class="btn-primary btn-update" id="updateReloadBtn">今すぐ更新</button>
+        <button type="button" class="btn-dismiss" id="updateDismissBtn">後で</button>
+    </div>
     <div class="container">
         <div class="standalone-message">
             <h3>スタンドアロン版 麻酔管理料計算アプリ</h3>
@@ -404,11 +446,18 @@
                 <li>神経ブロック硬膜外代用は硬膜外麻酔と併用不可</li>
                 <li>時間外・深夜休日加算は診療報酬算定要件を満たす場合のみ適用</li>
                 <li>本アプリは計算支援ツールです。実際の請求は最新の診療報酬点数表を確認してください</li>
+                <li>2026年7月反映の改定により、レベル4の基本点数（イ:9,015点／ロ:6,500点）と時間延長加算（650点）を更新しました。名称変更を伴う一連の見直しの一部ですが、本アプリの表示ラベルへの影響はありません</li>
             </ul>
         </div>
+
+        <div class="app-version" id="appVersionLabel"></div>
     </div>
-    
+
     <script>
+        // アプリバージョン（リリース時は version.json と同時に更新する）
+        const APP_VERSION = '1.2';
+        document.getElementById('appVersionLabel').textContent = `v${APP_VERSION}`;
+
         // 麻酔管理料計算ロジック（JavaScriptに移植）
         class AnesthesiaCalculator {
             constructor() {
@@ -422,13 +471,13 @@
                     1: { difficult: 24900, normal: 18200 },
                     2: { difficult: 16720, normal: 12190 },
                     3: { difficult: 12610, normal: 9170 },
-                    4: { difficult: 9130, normal: 6610 },
+                    4: { difficult: 9015, normal: 6500 },
                     5: { difficult: 8300, normal: 6000 }
                 };
-                
+
                 // 時間延長加算表
                 this.timeExtensionTable = {
-                    1: 1800, 2: 1200, 3: 900, 4: 660, 5: 600
+                    1: 1800, 2: 1200, 3: 900, 4: 650, 5: 600
                 };
                 
                 // 硬膜外麻酔加算表
@@ -778,6 +827,54 @@
         
         // 初期計算実行
         calculateResults();
+
+        // ===== バージョンチェック（更新通知） =====
+        let updateCheckInFlight = false;
+
+        async function checkForUpdate() {
+            if (updateCheckInFlight) return;
+            updateCheckInFlight = true;
+            try {
+                const response = await fetch(`version.json?_=${Date.now()}`, { cache: 'no-store' });
+                if (!response.ok) return;
+                const data = await response.json();
+                if (data.version && data.version !== APP_VERSION) {
+                    showUpdateBanner(data.version);
+                }
+            } catch (error) {
+                // オフライン・ローカルファイル実行（file://）では取得できないため無視
+            } finally {
+                updateCheckInFlight = false;
+            }
+        }
+
+        function showUpdateBanner(newVersion) {
+            const banner = document.getElementById('updateBanner');
+            if (banner.dataset.shown === 'true') return;
+            banner.dataset.shown = 'true';
+            document.getElementById('updateBannerText').textContent =
+                `新しいバージョン（v${newVersion}）が利用可能です。最新の点数表に更新してください。`;
+            banner.style.display = 'flex';
+        }
+
+        document.getElementById('updateReloadBtn').addEventListener('click', () => {
+            location.href = location.pathname + '?_=' + Date.now();
+        });
+
+        document.getElementById('updateDismissBtn').addEventListener('click', () => {
+            document.getElementById('updateBanner').style.display = 'none';
+        });
+
+        // 初回チェック（読み込み後、少し遅延させて実行）
+        window.addEventListener('load', () => setTimeout(checkForUpdate, 1500));
+
+        // タブが再度アクティブになった時に再チェック
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') checkForUpdate();
+        });
+
+        // 開きっぱなしのタブ向けに定期チェック（10分毎）
+        setInterval(checkForUpdate, 10 * 60 * 1000);
     </script>
 </body>
 </html>
