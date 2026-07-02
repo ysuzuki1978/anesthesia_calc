@@ -1,7 +1,7 @@
 # 麻酔管理料計算アプリ 技術仕様書
 
 **開発者**: YASUYUKI SUZUKI  
-**バージョン**: 1.2
+**バージョン**: 1.3
 **対応診療報酬**: 2026年7月反映の改定版（令和6年（2024年）改訂版をベースに、レベル4関連の点数を更新）
 **プラットフォーム**: Web（HTML/JavaScript スタンドアロン）
 
@@ -208,6 +208,14 @@ guard !(hasNerveBlock && nerveBlockType == .epiduralSubstitute) else { return 0 
 
 ### 3. 硬膜外時間延長の基準
 - 全身麻酔の総時間に基づいて算定（120分超過分）
+
+### 4. 時間外・深夜休日加算の適用範囲（重要）
+- 倍率（1.4倍・1.8倍）は全身麻酔（基本点数・時間延長加算）と硬膜外麻酔加算（基本・時間延長）にのみ適用
+- 神経ブロック加算は倍率の対象外。倍率適用後の小計に非乗算のまま加算する
+```swift
+let multipliableTotal = basePoints + timeExtension + epiduralPoints + epiduralTimeExtension
+let totalPoints = floor(multipliableTotal * multiplier) + nerveBlockPoints
+```
 
 ## 実装上の注意点
 
