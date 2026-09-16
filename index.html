@@ -341,27 +341,27 @@
                     <h4>麻酔時間（レベル別）</h4>
                     <div class="form-row">
                         <label>レベル1:</label>
-                        <input type="number" name="level1" id="level1" min="0" placeholder="分">
+                        <input type="number" name="level1" id="level1" min="0" step="1" placeholder="分">
                         <span>分</span>
                     </div>
                     <div class="form-row">
                         <label>レベル2:</label>
-                        <input type="number" name="level2" id="level2" min="0" placeholder="分">
+                        <input type="number" name="level2" id="level2" min="0" step="1" placeholder="分">
                         <span>分</span>
                     </div>
                     <div class="form-row">
                         <label>レベル3:</label>
-                        <input type="number" name="level3" id="level3" min="0" placeholder="分">
+                        <input type="number" name="level3" id="level3" min="0" step="1" placeholder="分">
                         <span>分</span>
                     </div>
                     <div class="form-row">
                         <label>レベル4:</label>
-                        <input type="number" name="level4" id="level4" min="0" placeholder="分">
+                        <input type="number" name="level4" id="level4" min="0" step="1" placeholder="分">
                         <span>分</span>
                     </div>
                     <div class="form-row">
                         <label>レベル5:</label>
-                        <input type="number" name="level5" id="level5" min="0" placeholder="分">
+                        <input type="number" name="level5" id="level5" min="0" step="1" placeholder="分">
                         <span>分</span>
                     </div>
                 </div>
@@ -514,17 +514,17 @@
                 // 麻酔時間
                 for (let i = 1; i <= 5; i++) {
                     const value = formData.get(`level${i}`);
-                    this.anesthesiaTimes[i-1] = value ? Math.max(0, parseInt(value)) : 0;
+                    this.anesthesiaTimes[i-1] = value ? Math.max(0, Number(value)) : 0;
                 }
                 
                 // その他の設定
                 this.severityLevel = formData.get('severity') || 'normal';
-                this.hasEpiduralAnesthesia = formData.has('hasEpidural');
+                this.hasEpiduralAnesthesia = formData.get('hasEpidural') === 'on';
                 this.epiduralLocation = formData.get('epiduralLocation') || 'lumbar';
-                this.hasNerveBlock = formData.has('hasNerveBlock');
+                this.hasNerveBlock = formData.get('hasNerveBlock') === 'on';
                 this.nerveBlockType = formData.get('nerveBlockType') || 'other';
-                this.hasOvertimeAddition = formData.has('hasOvertime');
-                this.hasNightHolidayAddition = formData.has('hasNightHoliday');
+                this.hasOvertimeAddition = formData.get('hasOvertime') === 'on';
+                this.hasNightHolidayAddition = formData.get('hasNightHoliday') === 'on';
             }
             
             getActiveLevels() {
